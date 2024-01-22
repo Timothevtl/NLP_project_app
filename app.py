@@ -93,6 +93,16 @@ def find_closest_books(input_name, new_tfidf_vectorizer, new_tfidf_matrix,book_d
     closest_books = book_df['book_name'].iloc[closest_indices].tolist()
     return closest_books
 
+@st.cache(allow_output_mutation=True)
+def load_qa_pipeline():
+    return pipeline("question-answering", model="distilbert-base-uncased-distilled-squad", tokenizer="distilbert-base-uncased-distilled-squad")
+
+@st.cache
+def load_csv_from_github(url):
+    # Show a message while downloading
+    st.text('Downloading data from GitHub...')
+    return pd.read_csv(url)
+
 def download_file(url, filename):
     response = requests.get(url)
     if response.status_code == 200:
@@ -102,27 +112,27 @@ def download_file(url, filename):
         response.raise_for_status()
 
 def interactive_qa_t5(df, new_tfidf_matrix, qa_pipeline):
-    while True:
-        book_name = input("Enter a book name to ask about (or 'exit' to quit): ").strip()
+    book_name = st.text_input("Enter a book name to ask about:").strip()
+
+    if book_name:
         if book_name.lower() == 'exit':
-            break
+            st.stop()
 
         if book_name not in df['book_name'].values:
             closest_books = find_closest_books(book_name, new_tfidf_matrix, df, top_n=5)
-            print("Did you mean one of these books?")
+            st.write("Did you mean one of these books?")
             for name in closest_books:
-                print(f"- {name}")
-            book_name = input("Please enter the correct book name (or 'exit' to quit): ").strip()
-            if book_name.lower() == 'exit':
-                break
+                st.write(f"- {name}")
 
-        if book_name in df['book_name'].values:
-            summary = df[df['book_name'] == book_name]['cleaned_summary'].iloc[0]
-            question = input("What is your question about the book? ")
-            answer = answer_question(question, summary, qa_pipeline)
-            print(f"Answer: {answer}\n")
+            # User can then modify their input based on suggestions
+            st.write("Please enter the correct book name in the input box above (or type 'exit' to quit).")
         else:
-            print("Book not found. Please try again.\n")
+            summary = df[df['book_name'] == book_name]['cleaned_summary'].iloc[0]
+            question = st.text_input("What is your question about the book?")
+            if question:
+                with st.spinner('Finding the answer...'):
+                    answer = answer_question(question, summary, qa_pipeline)
+                    st.write(f"Answer: {answer}")
 
 # Main
 def main():
@@ -174,15 +184,23 @@ def main():
 
     elif app_mode == "Question Answering":
         st.title("Question Answering with BART")
-        st.write('Loading models...')
-        # Load BART QA model only if this option is chosen
-        qa_pipeline = pipeline("question-answering", model="distilbert-base-uncased-distilled-squad", tokenizer="distilbert-base-uncased-distilled-squad")
+
+        # Display a message while loading the model
+        with st.spinner('Loading Question Answering model...'):
+            qa_pipeline = load_qa_pipeline()
+
+        # Load and display the dataset (with caching to avoid re-loading)
         book_df = load_csv_from_github('https://raw.githubusercontent.com/Timothevtl/NLP_project_app/main/book_df.csv')
         new_tfidf_vectorizer = TfidfVectorizer()
         new_tfidf_matrix = new_tfidf_vectorizer.fit_transform(book_df['book_name'])
+
+        # User input for question
+        question = st.text_input("Enter your question")
         if st.button("Get Answer"):
-            answer = interactive_qa_t5(book_df, new_tfidf_matrix, qa_pipeline)
-            st.write("Answer:", answer)
+            with st.spinner('Finding the answer...'):
+                answer = interactive_qa_t5(book_df, new_tfidf_matrix, qa_pipeline, question)
+                st.write("Answer:", answer)
+
 
 # Run the app
 if __name__ == "__main__":
