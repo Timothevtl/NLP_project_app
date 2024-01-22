@@ -50,7 +50,7 @@ def download_file_from_github(file_url, file_name):
 def load_model_from_github(file_name, github_url):
     if not os.path.exists(file_name):
         download_file_from_github(github_url + file_name, file_name)
-    return joblib.load(file_name)
+    return joblib.load(github_url + file_name)
 
 def semantic_search(model, search_term, top_n=5):
     search_term_vector = model.wv[search_term]
@@ -125,7 +125,7 @@ def main():
         # Load the chosen model
         if model_choice == "XGBoost":
             model = xgb.Booster()
-            model.load_model('https://github.com/Timothevtl/NLP_project_app/raw/main/xgboost_model.json')
+            model.load_model('https://raw.githubusercontent.com/Timothevtl/NLP_project_app/main/xgboost_model.json')
         else:
             model = load_model_from_github('optimized_rf_model.joblib', github_url)
         review_text = st.text_area("Enter the review text here")
@@ -137,7 +137,7 @@ def main():
     elif app_mode == "Semantic Search":
         st.title("Semantic Search with Word2Vec")
         # Load Word2Vec model only if this option is chosen
-        word2vec_model = Word2Vec.load("https://github.com/Timothevtl/NLP_project_app/raw/main/word2vec_model.model")
+        word2vec_model = Word2Vec.load("https://raw.githubusercontent.com/Timothevtl/NLP_project_app/main/word2vec_model.model")
     
         # UI elements for semantic search
         search_term = st.text_input("Enter a word for semantic search")
@@ -150,8 +150,8 @@ def main():
         st.write('Loading models...')
         # Load BART QA model only if this option is chosen
         qa_pipeline = pipeline("question-answering", model="distilbert-base-uncased-distilled-squad", tokenizer="distilbert-base-uncased-distilled-squad")
-        book_df = pd.read_csv('https://raw.githubusercontent.com/Timothevtl/NLP_project_app/main/1000_best_books_summary.csv')
-        new_tfidf_vectorizer = load_model_from_github('QA_tfidf_vectorizer.joblib', github_url)
+        book_df = pd.read_csv('https://github.com/Timothevtl/NLP_project_app/raw/main/1000_best_books_summary.csv')
+        new_tfidf_vectorizer = load_model_from_github('QA_tfidf_vectorizer.joblib', 'https://github.com/Timothevtl/NLP_project_app/raw/main/')
         new_tfidf_matrix = new_tfidf_vectorizer.fit_transform(book_df['book_name'])
         if st.button("Get Answer"):
             answer = interactive_qa_t5(book_df, new_tfidf_matrix, qa_pipeline)
