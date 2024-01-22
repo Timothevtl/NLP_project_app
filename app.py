@@ -31,6 +31,21 @@ def clean_text(text):
     filtered_words = [word for word in words if word not in english_stopwords]
     return " ".join(filtered_words)
 
+def download_and_unzip(url, zip_path, extract_to='.'):
+    # Check if zip file already exists
+    if not os.path.exists(zip_path):
+        # Download the zip file
+        response = requests.get(url, stream=True)
+        if response.status_code == 200:
+            with open(zip_path, 'wb') as f:
+                f.write(response.content)
+        else:
+            response.raise_for_status()
+
+    # Unzip the file
+    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+        zip_ref.extractall(extract_to)
+
 # Function to predict sentiment
 def predict_sentiment(review, model, vectorizer, label_encoder):
     review = clean_text(review)
@@ -145,25 +160,17 @@ def main():
         st.title("Sentiment Analysis of Book Reviews")
         model_choice = st.selectbox("Select a model for analysis", ["RandomForest"])
 
-        # Define GitHub URL
-        github_url = "https://raw.githubusercontent.com/Timothevtl/NLP_project_app/main/"
-        tfidf_vectorizer_url = "https://github.com/Timothevtl/NLP_project_app/raw/main/tfidf_vectorizer.joblib"
-        local_filename = "tfidf_vectorizer.joblib"
-        if not os.path.exists(local_filename):
-            download_file(tfidf_vectorizer_url, local_filename)
-        # Load TF-IDF Vectorizer
-        tfidf_vectorizer = joblib.load(local_filename)
+        
+        # URL of the zipped file
+        zip_url = "https://github.com/Timothevtl/NLP_repository/raw/main/optimized_rf_model.zip"
+        zip_path = "optimized_rf_model.zip"
 
-        # Load the chosen model
-        #if model_choice == "XGBoost":
-            #model = xgb.Booster()
-            #model.load_model('https://raw.githubusercontent.com/Timothevtl/NLP_project_app/main/xgboost_model.json')
-        #else:
-        local_filename = "optimized_rf_model.joblib"
-        if not os.path.exists(local_filename):
-            download_file('https://github.com/Timothevtl/NLP_project_app/raw/main/optimized_rf_model.joblib', 'optimized_rf_model.joblib')
-        # Load TF-IDF Vectorizer
-        model = joblib.load(local_filename)
+        # Download and unzip
+        download_and_unzip(zip_url, zip_path)
+
+        # Load TF-IDF Vectorizer and Optimized RandomForest Model
+        tfidf_vectorizer = joblib.load("tfidf_vectorizer.joblib")
+        model = joblib.load("optimized_rf_model.joblib")
         review_text = st.text_area("Enter the review text here")
         if st.button("Analyze Sentiment"):
             sentiment, score = predict_sentiment(review_text, model, tfidf_vectorizer, label_encoder)
