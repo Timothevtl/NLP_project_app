@@ -1,0 +1,10 @@
+streamlit
+gensim
+transformers
+joblib
+scikit-learn
+numpy
+pandas
+requests
+nltk
+xgboost
