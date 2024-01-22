@@ -16,6 +16,7 @@ import xgboost as xgb
 from sklearn.metrics.pairwise import cosine_similarity
 import torch
 from sklearn.feature_extraction.text import TfidfVectorizer
+from io import StringIO
 
 nltk.download('stopwords')
 english_stopwords = set(stopwords.words('english'))
@@ -52,6 +53,15 @@ def load_model_from_github(file_name, github_url):
     if not os.path.exists(file_name):
         download_file_from_github(github_url + file_name, file_name)
     return joblib.load(github_url + file_name)
+
+def load_csv_from_github(url):
+    response = requests.get(url)
+    if response.status_code == 200:
+        csv_data = StringIO(response.content.decode('utf-8'))
+        df = pd.read_csv(csv_data)
+        return df
+    else:
+        response.raise_for_status()
 
 def semantic_search(model, search_term, top_n=5):
     search_term_vector = model.wv[search_term]
@@ -163,7 +173,7 @@ def main():
         st.write('Loading models...')
         # Load BART QA model only if this option is chosen
         qa_pipeline = pipeline("question-answering", model="distilbert-base-uncased-distilled-squad", tokenizer="distilbert-base-uncased-distilled-squad")
-        book_df = pd.read_csv('https://github.com/Timothevtl/NLP_project_app/raw/main/1000_best_books_summary.csv')
+        book_df = load_csv_from_github('https://raw.githubusercontent.com/Timothevtl/NLP_project_app/main/book_df.csv')
         new_tfidf_vectorizer = TfidfVectorizer()
         new_tfidf_matrix = new_tfidf_vectorizer.fit_transform(book_df['book_name'])
         if st.button("Get Answer"):
