@@ -83,6 +83,14 @@ def find_closest_books(input_name, new_tfidf_vectorizer, new_tfidf_matrix,book_d
     closest_books = book_df['book_name'].iloc[closest_indices].tolist()
     return closest_books
 
+def download_file(url, filename):
+    response = requests.get(url)
+    if response.status_code == 200:
+        with open(filename, 'wb') as f:
+            f.write(response.content)
+    else:
+        response.raise_for_status()
+
 def interactive_qa_t5(df, new_tfidf_matrix, qa_pipeline):
     while True:
         book_name = input("Enter a book name to ask about (or 'exit' to quit): ").strip()
@@ -119,9 +127,12 @@ def main():
 
         # Define GitHub URL
         github_url = "https://raw.githubusercontent.com/Timothevtl/NLP_project_app/main/"
-
+        tfidf_vectorizer_url = "https://github.com/Timothevtl/NLP_project_app/raw/main/tfidf_vectorizer.joblib"
+        local_filename = "tfidf_vectorizer.joblib"
+        if not os.path.exists(local_filename):
+            download_file(tfidf_vectorizer_url, local_filename)
         # Load TF-IDF Vectorizer
-        tfidf_vectorizer = joblib.load('https://github.com/Timothevtl/NLP_project_app/raw/main/tfidf_vectorizer.joblib')
+        tfidf_vectorizer = joblib.load(local_filename)
 
         # Load the chosen model
         if model_choice == "XGBoost":
@@ -144,7 +155,8 @@ def main():
         search_term = st.text_input("Enter a word for semantic search")
         if st.button("Search"):
             similar_words = semantic_search(word2vec_model, search_term, top_n=10)
-            st.write("Similar words:", similar_words)
+            df = pd.DataFrame(similar_words, columns=["Word", "Similarity Score"])
+            st.table(df)
 
     elif app_mode == "Question Answering":
         st.title("Question Answering with BART")
