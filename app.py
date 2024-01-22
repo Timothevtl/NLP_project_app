@@ -155,15 +155,15 @@ def main():
         tfidf_vectorizer = joblib.load(local_filename)
 
         # Load the chosen model
-        if model_choice == "XGBoost":
-            model = xgb.Booster()
-            model.load_model('https://raw.githubusercontent.com/Timothevtl/NLP_project_app/main/xgboost_model.json')
-        else:
-            local_filename = "optimized_rf_model.joblib"
-            if not os.path.exists(local_filename):
-                download_file('https://github.com/Timothevtl/NLP_project_app/raw/main/optimized_rf_model.joblib', 'optimized_rf_model.joblib')
+        #if model_choice == "XGBoost":
+            #model = xgb.Booster()
+            #model.load_model('https://raw.githubusercontent.com/Timothevtl/NLP_project_app/main/xgboost_model.json')
+        #else:
+        local_filename = "optimized_rf_model.joblib"
+        if not os.path.exists(local_filename):
+            download_file('https://github.com/Timothevtl/NLP_project_app/raw/main/optimized_rf_model.joblib', 'optimized_rf_model.joblib')
         # Load TF-IDF Vectorizer
-            model = joblib.load(local_filename)
+        model = joblib.load(local_filename)
         review_text = st.text_area("Enter the review text here")
         if st.button("Analyze Sentiment"):
             sentiment, score = predict_sentiment(review_text, model, tfidf_vectorizer, label_encoder)
