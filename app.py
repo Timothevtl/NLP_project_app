@@ -15,6 +15,7 @@ import os
 import xgboost as xgb
 from sklearn.metrics.pairwise import cosine_similarity
 import torch
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 nltk.download('stopwords')
 english_stopwords = set(stopwords.words('english'))
@@ -120,7 +121,7 @@ def main():
         github_url = "https://raw.githubusercontent.com/Timothevtl/NLP_project_app/main/"
 
         # Load TF-IDF Vectorizer
-        tfidf_vectorizer = load_model_from_github('tfidf_vectorizer.joblib', github_url)
+        tfidf_vectorizer = joblib.load('https://github.com/Timothevtl/NLP_project_app/raw/main/tfidf_vectorizer.joblib')
 
         # Load the chosen model
         if model_choice == "XGBoost":
@@ -151,7 +152,7 @@ def main():
         # Load BART QA model only if this option is chosen
         qa_pipeline = pipeline("question-answering", model="distilbert-base-uncased-distilled-squad", tokenizer="distilbert-base-uncased-distilled-squad")
         book_df = pd.read_csv('https://github.com/Timothevtl/NLP_project_app/raw/main/1000_best_books_summary.csv')
-        new_tfidf_vectorizer = load_model_from_github('QA_tfidf_vectorizer.joblib', 'https://github.com/Timothevtl/NLP_project_app/raw/main/')
+        new_tfidf_vectorizer = TfidfVectorizer()
         new_tfidf_matrix = new_tfidf_vectorizer.fit_transform(book_df['book_name'])
         if st.button("Get Answer"):
             answer = interactive_qa_t5(book_df, new_tfidf_matrix, qa_pipeline)
