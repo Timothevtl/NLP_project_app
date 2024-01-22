@@ -15,6 +15,7 @@ import os
 import xgboost as xgb
 from sklearn.metrics.pairwise import cosine_similarity
 
+nltk.download('stopwords')
 english_stopwords = set(stopwords.words('english'))
 
 def clean_text(text):
