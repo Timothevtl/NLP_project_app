@@ -143,7 +143,7 @@ def main():
     if app_mode == "Sentiment Analysis":
         label_encoder = LabelEncoder().fit(['negative', 'neutral', 'positive'])
         st.title("Sentiment Analysis of Book Reviews")
-        model_choice = st.selectbox("Select a model for analysis", ["XGBoost", "RandomForest"])
+        model_choice = st.selectbox("Select a model for analysis", ["RandomForest"])
 
         # Define GitHub URL
         github_url = "https://raw.githubusercontent.com/Timothevtl/NLP_project_app/main/"
