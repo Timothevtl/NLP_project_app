@@ -194,12 +194,8 @@ def main():
         new_tfidf_vectorizer = TfidfVectorizer()
         new_tfidf_matrix = new_tfidf_vectorizer.fit_transform(book_df['book_name'])
 
-        # User input for question
-        question = st.text_input("Enter your question")
-        if st.button("Get Answer"):
-            with st.spinner('Finding the answer...'):
-                answer = interactive_qa_t5(book_df, new_tfidf_matrix, qa_pipeline, question)
-                st.write("Answer:", answer)
+        answer = interactive_qa_t5(book_df, new_tfidf_matrix, qa_pipeline)
+        st.write("Answer:", answer)
 
 
 # Run the app
