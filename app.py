@@ -111,7 +111,7 @@ def download_file(url, filename):
     else:
         response.raise_for_status()
 
-def interactive_qa_t5(df, new_tfidf_matrix, qa_pipeline):
+def interactive_qa_t5(df, new_tfidf_vectorizer, new_tfidf_matrix, qa_pipeline):
     book_name = st.text_input("Enter a book name to ask about:").strip()
 
     if book_name:
@@ -119,7 +119,7 @@ def interactive_qa_t5(df, new_tfidf_matrix, qa_pipeline):
             st.stop()
 
         if book_name not in df['book_name'].values:
-            closest_books = find_closest_books(book_name, new_tfidf_matrix, df, top_n=5)
+            closest_books = find_closest_books(book_name, new_tfidf_vectorizer, new_tfidf_matrix, df, top_n=5)
             st.write("Did you mean one of these books?")
             for name in closest_books:
                 st.write(f"- {name}")
@@ -194,7 +194,7 @@ def main():
         new_tfidf_vectorizer = TfidfVectorizer()
         new_tfidf_matrix = new_tfidf_vectorizer.fit_transform(book_df['book_name'])
 
-        answer = interactive_qa_t5(book_df, new_tfidf_matrix, qa_pipeline)
+        answer = interactive_qa_t5(book_df,new_tfidf_vectorizer, new_tfidf_matrix, qa_pipeline)
         st.write("Answer:", answer)
 
 
