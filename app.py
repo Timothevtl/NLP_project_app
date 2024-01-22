@@ -17,6 +17,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 import torch
 from sklearn.feature_extraction.text import TfidfVectorizer
 from io import StringIO
+import zipfile
 
 nltk.download('stopwords')
 english_stopwords = set(stopwords.words('english'))
