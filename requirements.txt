@@ -8,7 +8,7 @@ pandas
 requests
 nltk
 xgboost
-torch==1.10.0+cpu
+torch==1.13.1
 torchvision==0.11.1+cpu
 torchaudio==0.10.0+cpu
 -f https://download.pytorch.org/whl/torch_stable.html
