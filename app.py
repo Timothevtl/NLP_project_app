@@ -14,6 +14,7 @@ import joblib
 import os
 import xgboost as xgb
 from sklearn.metrics.pairwise import cosine_similarity
+import torch
 
 nltk.download('stopwords')
 english_stopwords = set(stopwords.words('english'))
@@ -124,9 +125,9 @@ def main():
         # Load the chosen model
         if model_choice == "XGBoost":
             model = xgb.Booster()
-            model.load_model('https://raw.githubusercontent.com/Timothevtl/NLP_project_app/main/xgboost_model.json')
+            model.load_model('https://github.com/Timothevtl/NLP_project_app/raw/main/xgboost_model.json')
         else:
-            model = load_model_from_github('saved_randomforest_model.joblib', github_url)
+            model = load_model_from_github('optimized_rf_model.joblib', github_url)
         review_text = st.text_area("Enter the review text here")
         if st.button("Analyze Sentiment"):
             sentiment, score = predict_sentiment(review_text, model, tfidf_vectorizer, label_encoder)
@@ -136,7 +137,7 @@ def main():
     elif app_mode == "Semantic Search":
         st.title("Semantic Search with Word2Vec")
         # Load Word2Vec model only if this option is chosen
-        word2vec_model = Word2Vec.load("https://raw.githubusercontent.com/Timothevtl/NLP_project_app/main/word2vec_model.model")
+        word2vec_model = Word2Vec.load("https://github.com/Timothevtl/NLP_project_app/raw/main/word2vec_model.model")
     
         # UI elements for semantic search
         search_term = st.text_input("Enter a word for semantic search")
