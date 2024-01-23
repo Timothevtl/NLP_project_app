@@ -185,18 +185,24 @@ def main():
 
     elif app_mode == "Semantic Search":
         st.title("Semantic Search with Word2Vec")
-        # URLs for the model and .npy files
-        model_url = "https://github.com/Timothevtl/NLP_repository/raw/main/word2vec_finetuned.model"
-        npy_file1_url = "https://github.com/Timothevtl/NLP_repository/raw/main/word2vec_finetuned.model.syn1neg.npy"
-        npy_file2_url = "https://github.com/Timothevtl/NLP_repository/raw/main/word2vec_finetuned.model.wv.vectors.npy"
+        choice = st.selectbox("Select a word2vec model", ["trained on 1000 book summaries", "trained on 60 000 user reviews"])
+        if choice == "trained on 1000 book summaries":
+            model_original_url = "https://github.com/Timothevtl/NLP_project_app/raw/main/word2vec_model.model"
+            download_file(model_original_url, "word2vec_model.model")
+            word2vec_model = Word2Vec.load("word2vec_model.model")
+        elif choice == "trained on 60 000 user reviews"
+            # URLs for the model and .npy files
+            model_fined_tuned_url = "https://github.com/Timothevtl/NLP_repository/raw/main/word2vec_finetuned.model"
+            npy_file1_url = "https://github.com/Timothevtl/NLP_repository/raw/main/word2vec_finetuned.model.syn1neg.npy"
+            npy_file2_url = "https://github.com/Timothevtl/NLP_repository/raw/main/word2vec_finetuned.model.wv.vectors.npy"
 
-        # Download the model and .npy files
-        download_file(model_url, "word2vec_finetuned.model")
-        download_file(npy_file1_url, "word2vec_finetuned.model.syn1neg.npy")
-        download_file(npy_file2_url, "word2vec_finetuned.model.wv.vectors.npy")
+            # Download the model and .npy files
+            download_file(model_url, "word2vec_finetuned.model")
+            download_file(npy_file1_url, "word2vec_finetuned.model.syn1neg.npy")
+            download_file(npy_file2_url, "word2vec_finetuned.model.wv.vectors.npy")
 
-        # Load the model from the downloaded files
-        word2vec_model = Word2Vec.load("word2vec_finetuned.model")
+            # Load the model from the downloaded files
+            word2vec_model = Word2Vec.load("word2vec_finetuned.model")
     
         # UI elements for semantic search
         search_term = st.text_input("Enter a word for semantic search")
