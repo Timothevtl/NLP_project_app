@@ -35,6 +35,16 @@ def clean_text(text):
     filtered_words = [word for word in words if word not in english_stopwords]
     return " ".join(filtered_words)
 
+def transform_query(query):
+    query_tfidf = tfidf_vectorizer.transform([query])
+    return query_tfidf
+
+def find_similar_books(query, tfidf_matrix, book_names, book_summaries, top_n):
+    query_tfidf = transform_query(query)
+    cosine_similarities = cosine_similarity(query_tfidf, tfidf_matrix).flatten()
+    related_docs_indices = cosine_similarities.argsort()[:-top_n-1:-1]
+    return [(book_names[i], cosine_similarities[i], book_summaries[i]) for i in related_docs_indices]
+
 def download_and_unzip(url, zip_path, extract_to='.'):
     # Check if zip file already exists
     if not os.path.exists(zip_path):
@@ -159,8 +169,17 @@ def interactive_qa_t5(df, new_tfidf_vectorizer, new_tfidf_matrix, qa_pipeline):
 def main():
     st.title("Book Analysis Application")
     st.sidebar.title("Navigation")
-    app_mode = st.sidebar.radio("Go to", ["Home", "Sentiment Analysis", "Semantic Search", "Question Answering"])
-
+    app_mode = st.sidebar.radio("Go to", ["Home", "Sentiment Analysis", "Semantic Search", "Question Answering", "Book recommendation"])
+    if app_mode == "Book recommendation":
+        tfidf_vectorizer_similar_book = TfidfVectorizer(stop_words='english')
+        tfidf_matrix_similar_book = tfidf_vectorizer_similar_book.fit_transform(book_df['cleaned_summary'])
+        book_df = load_csv_from_github('https://raw.githubusercontent.com/Timothevtl/NLP_project_app/main/book_df.csv')
+        recommended_books = find_similar_books(user_query, tfidf_matrix, book_df['book_name'], book_df['summary_summary'], 3)
+        for book, score, summary in recommended_books:
+            st.write(f"Recommended Book:",book,"Score:" score)
+            if st.button("Display quick summary?"):
+            print(f"quick summary :{summary}\n")
+            
     if app_mode == "Sentiment Analysis":
         label_encoder = LabelEncoder().fit(['negative', 'neutral', 'positive'])
         st.title("Sentiment Analysis of Book Reviews")
