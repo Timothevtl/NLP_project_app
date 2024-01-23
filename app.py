@@ -39,11 +39,11 @@ def transform_query(query):
     query_tfidf = tfidf_vectorizer.transform([query])
     return query_tfidf
 
-def find_similar_books(query, tfidf_matrix, book_names, book_summaries, top_n):
+def find_similar_books(query, tfidf_matrix, book_names, book_summaries,book_rating, top_n):
     query_tfidf = transform_query(query)
     cosine_similarities = cosine_similarity(query_tfidf, tfidf_matrix).flatten()
     related_docs_indices = cosine_similarities.argsort()[:-top_n-1:-1]
-    return [(book_names[i], cosine_similarities[i], book_summaries[i]) for i in related_docs_indices]
+    return [(book_names[i], cosine_similarities[i], book_summaries[i], book_rating[i]) for i in related_docs_indices]
 
 def download_and_unzip(url, zip_path, extract_to='.'):
     # Check if zip file already exists
@@ -174,9 +174,11 @@ def main():
         tfidf_vectorizer_similar_book = TfidfVectorizer(stop_words='english')
         book_df = load_csv_from_github('https://raw.githubusercontent.com/Timothevtl/NLP_project_app/main/book_df.csv')
         tfidf_matrix_similar_book = tfidf_vectorizer_similar_book.fit_transform(book_df['cleaned_summary'])
-        recommended_books = find_similar_books(user_query, tfidf_matrix, book_df['book_name'], book_df['summary_summary'], 3)
-        for book, score, summary in recommended_books:
-            st.write("Recommended Book:",book,"Score:",score)
+        user_query = st.text_input("Enter a query, for example : 'A book about wizards'")
+        recommended_books = find_similar_books(user_query, tfidf_matrix_similar_book, book_df['book_name'], book_df['summary_summary'],book_df['average_rating'], 3)
+        for book, score, summary, rating in recommended_books:
+            st.write("Recommended Book:",book,"Similarity score:",score)
+            st.write("This book's average ratings :", rating)
             if st.button("Display quick summary?"):
                 st.write("quick summary :",summary)
             
