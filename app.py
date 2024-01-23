@@ -176,9 +176,8 @@ def main():
         if st.button("Find similar book"):
             recommended_books = find_similar_books(user_query,tfidf_vectorizer_similar_book, tfidf_matrix_similar_book, book_df['book_name'], book_df['summary_summary'],book_df['average_rating'], 3)
             for book, score, summary, rating in recommended_books:
-                st.write("Recommended Book:",book,"Similarity score:",score)
-                st.write("This book's average ratings :", rating)
-                st.write("quick summary :",summary)
+                with st.expander(f"{book} (Score: {score}, Rating: {rating})"):
+                    st.write(f"Summary: {summary}")
             
     elif app_mode == "Sentiment Analysis":
         label_encoder = LabelEncoder().fit(['negative', 'neutral', 'positive'])
