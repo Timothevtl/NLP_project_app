@@ -174,9 +174,9 @@ def main():
         tfidf_matrix_similar_book = tfidf_vectorizer_similar_book.fit_transform(book_df['cleaned_summary'])
         user_query = st.text_input("Enter a query, for example : 'A book about wizards'")
         if st.button("Find similar book"):
-            recommended_books = find_similar_books(user_query,tfidf_vectorizer_similar_book, tfidf_matrix_similar_book, book_df['book_name'], book_df['summary_summary'],book_df['average_rating'], 3)
+            recommended_books = find_similar_books(user_query,tfidf_vectorizer_similar_book, tfidf_matrix_similar_book, book_df['book_name'], book_df['summary_summary'],book_df['average_rating'], 5)
             for book, score, summary, rating in recommended_books:
-                with st.expander(f"{book} (Score: {score}, Rating: {rating})"):
+                with st.expander(f"{book} (Similarity Score: {score}, Rating: {rating})"):
                     st.write(f"Summary: {summary}")
             
     elif app_mode == "Sentiment Analysis":
