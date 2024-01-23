@@ -197,7 +197,7 @@ def main():
             npy_file2_url = "https://github.com/Timothevtl/NLP_repository/raw/main/word2vec_finetuned.model.wv.vectors.npy"
 
             # Download the model and .npy files
-            download_file(model_url, "word2vec_finetuned.model")
+            download_file(model_fined_tuned_url, "word2vec_finetuned.model")
             download_file(npy_file1_url, "word2vec_finetuned.model.syn1neg.npy")
             download_file(npy_file2_url, "word2vec_finetuned.model.wv.vectors.npy")
 
