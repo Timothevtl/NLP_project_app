@@ -19,7 +19,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from io import StringIO
 import zipfile
 
-st.cache_data
+st.cache_resource
 def get_english_stopwords():
     nltk.download('stopwords')
     english_stopwords = set(stopwords.words('english'))
