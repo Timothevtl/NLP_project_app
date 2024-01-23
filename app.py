@@ -172,8 +172,8 @@ def main():
     app_mode = st.sidebar.radio("Go to", ["Home", "Sentiment Analysis", "Semantic Search", "Question Answering", "Book recommendation"])
     if app_mode == "Book recommendation":
         tfidf_vectorizer_similar_book = TfidfVectorizer(stop_words='english')
-        tfidf_matrix_similar_book = tfidf_vectorizer_similar_book.fit_transform(book_df['cleaned_summary'])
         book_df = load_csv_from_github('https://raw.githubusercontent.com/Timothevtl/NLP_project_app/main/book_df.csv')
+        tfidf_matrix_similar_book = tfidf_vectorizer_similar_book.fit_transform(book_df['cleaned_summary'])
         recommended_books = find_similar_books(user_query, tfidf_matrix, book_df['book_name'], book_df['summary_summary'], 3)
         for book, score, summary in recommended_books:
             st.write("Recommended Book:",book,"Score:",score)
