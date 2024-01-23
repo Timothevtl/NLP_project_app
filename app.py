@@ -113,16 +113,17 @@ def find_closest_books(input_name, new_tfidf_vectorizer, new_tfidf_matrix,book_d
     closest_books = book_df['book_name'].iloc[closest_indices].tolist()
     return closest_books
 
-@st.cache(allow_output_mutation=True)
+@st.cache_resource
 def load_qa_pipeline():
     return pipeline("question-answering", model="distilbert-base-uncased-distilled-squad", tokenizer="distilbert-base-uncased-distilled-squad")
 
-@st.cache
+@st.cache_resource
 def load_csv_from_github(url):
     # Show a message while downloading
     st.text('Downloading data from GitHub...')
     return pd.read_csv(url)
 
+@st.cache_resource
 def download_file(url, filename):
     response = requests.get(url, stream=True)
     if response.status_code == 200:
