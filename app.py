@@ -124,10 +124,11 @@ def load_csv_from_github(url):
     return pd.read_csv(url)
 
 def download_file(url, filename):
-    response = requests.get(url)
+    response = requests.get(url, stream=True)
     if response.status_code == 200:
         with open(filename, 'wb') as f:
-            f.write(response.content)
+            for chunk in response.iter_content(chunk_size=8192):
+                f.write(chunk)
     else:
         response.raise_for_status()
 
@@ -184,8 +185,18 @@ def main():
 
     elif app_mode == "Semantic Search":
         st.title("Semantic Search with Word2Vec")
-        # Load Word2Vec model only if this option is chosen
-        word2vec_model = Word2Vec.load("https://raw.githubusercontent.com/Timothevtl/NLP_project_app/main/word2vec_model.model")
+        # URLs for the model and .npy files
+        model_url = "https://github.com/Timothevtl/NLP_repository/raw/main/word2vec_finetuned.model"
+        npy_file1_url = "https://github.com/Timothevtl/NLP_repository/raw/main/word2vec_finetuned.model.syn1neg.npy"
+        npy_file2_url = "https://github.com/Timothevtl/NLP_repository/raw/main/word2vec_finetuned.model.wv.vectors.npy"
+
+        # Download the model and .npy files
+        download_file(model_url, "word2vec_finetuned.model")
+        download_file(npy_file1_url, "word2vec_finetuned.model.syn1neg.npy")
+        download_file(npy_file2_url, "word2vec_finetuned.model.wv.vectors.npy")
+
+        # Load the model from the downloaded files
+        word2vec_model = Word2Vec.load("word2vec_finetuned.model")
     
         # UI elements for semantic search
         search_term = st.text_input("Enter a word for semantic search")
