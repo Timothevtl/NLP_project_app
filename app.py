@@ -21,13 +21,11 @@ import zipfile
 
 @st.cache
 def get_english_stopwords():
-    nltk.download('stopwords')
-    return set(stopwords.words('english'))
-
-# Usage
-english_stopwords = get_english_stopwords()
+    stopwords = nltk.download('stopwords')
+    return set(stopwords)
 
 def clean_text(text):
+    english_stopwords = get_english_stopwords()
     # Convert text to lowercase
     text = text.lower()
     # Remove punctuation
