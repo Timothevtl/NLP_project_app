@@ -128,8 +128,6 @@ def load_qa_pipeline():
 
 @st.cache_resource
 def load_csv_from_github(url):
-    # Show a message while downloading
-    st.text('Downloading data from GitHub...')
     return pd.read_csv(url)
 
 @st.cache_resource
