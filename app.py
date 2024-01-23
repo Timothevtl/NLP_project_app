@@ -173,13 +173,14 @@ def main():
         book_df = load_csv_from_github('https://raw.githubusercontent.com/Timothevtl/NLP_project_app/main/book_df.csv')
         tfidf_matrix_similar_book = tfidf_vectorizer_similar_book.fit_transform(book_df['cleaned_summary'])
         user_query = st.text_input("Enter a query, for example : 'A book about wizards'")
-        recommended_books = find_similar_books(user_query,tfidf_vectorizer_similar_book, tfidf_matrix_similar_book, book_df['book_name'], book_df['summary_summary'],book_df['average_rating'], 3)
-        for book, score, summary, rating in recommended_books:
-            st.write("Recommended Book:",book,"Similarity score:",score)
-            st.write("This book's average ratings :", rating)
-            st.write("quick summary :",summary)
+        if st.button("Find similar book"):
+            recommended_books = find_similar_books(user_query,tfidf_vectorizer_similar_book, tfidf_matrix_similar_book, book_df['book_name'], book_df['summary_summary'],book_df['average_rating'], 3)
+            for book, score, summary, rating in recommended_books:
+                st.write("Recommended Book:",book,"Similarity score:",score)
+                st.write("This book's average ratings :", rating)
+                st.write("quick summary :",summary)
             
-    if app_mode == "Sentiment Analysis":
+    elif app_mode == "Sentiment Analysis":
         label_encoder = LabelEncoder().fit(['negative', 'neutral', 'positive'])
         st.title("Sentiment Analysis of Book Reviews")
         model_choice = st.selectbox("Select a model for analysis", ["RandomForest"])
