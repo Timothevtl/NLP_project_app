@@ -21,8 +21,9 @@ import zipfile
 
 @st.cache
 def get_english_stopwords():
-    stopwords = nltk.download('stopwords')
-    return set(stopwords)
+    nltk.download('stopwords')
+    english_stopwords = set(stopwords.words('english'))
+    return english_stopwords
 
 def clean_text(text):
     english_stopwords = get_english_stopwords()
