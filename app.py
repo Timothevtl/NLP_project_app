@@ -19,8 +19,13 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from io import StringIO
 import zipfile
 
-nltk.download('stopwords')
-english_stopwords = set(stopwords.words('english'))
+@st.cache
+def get_english_stopwords():
+    nltk.download('stopwords')
+    return set(stopwords.words('english'))
+
+# Usage
+english_stopwords = get_english_stopwords()
 
 def clean_text(text):
     # Convert text to lowercase
