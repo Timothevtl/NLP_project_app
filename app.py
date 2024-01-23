@@ -179,9 +179,7 @@ def main():
         for book, score, summary, rating in recommended_books:
             st.write("Recommended Book:",book,"Similarity score:",score)
             st.write("This book's average ratings :", rating)
-            a = st.button("Display quick summary?")
-            if a:
-                st.write("quick summary :",summary)
+            st.write("quick summary :",summary)
             
     if app_mode == "Sentiment Analysis":
         label_encoder = LabelEncoder().fit(['negative', 'neutral', 'positive'])
