@@ -179,7 +179,8 @@ def main():
         for book, score, summary, rating in recommended_books:
             st.write("Recommended Book:",book,"Similarity score:",score)
             st.write("This book's average ratings :", rating)
-            if st.button("Display quick summary?"):
+            a = st.button("Display quick summary?")
+            if a:
                 st.write("quick summary :",summary)
             
     if app_mode == "Sentiment Analysis":
