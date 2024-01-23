@@ -176,9 +176,9 @@ def main():
         book_df = load_csv_from_github('https://raw.githubusercontent.com/Timothevtl/NLP_project_app/main/book_df.csv')
         recommended_books = find_similar_books(user_query, tfidf_matrix, book_df['book_name'], book_df['summary_summary'], 3)
         for book, score, summary in recommended_books:
-            st.write(f"Recommended Book:",book,"Score:",score)
+            st.write("Recommended Book:",book,"Score:",score)
             if st.button("Display quick summary?"):
-            print(f"quick summary :{summary}\n")
+                st.write("quick summary :",summary)
             
     if app_mode == "Sentiment Analysis":
         label_encoder = LabelEncoder().fit(['negative', 'neutral', 'positive'])
