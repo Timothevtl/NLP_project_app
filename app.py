@@ -75,16 +75,13 @@ def predict_sentiment(review, model, vectorizer, label_encoder):
     score = prediction_proba[prediction_index]
     return prediction_label, score
 
-def predict_sentiment_xgboost(review, model, vectorizer, label_encoder, dmatrix_params={}):
+def predict_sentiment_xgboost(review, model, vectorizer, label_encoder):
     # Clean and vectorize the review
     review_cleaned = clean_text(review)
     review_vectorized = vectorizer.transform([review_cleaned])
 
-    # Convert to DMatrix, which XGBoost uses
-    dtest = xgb.DMatrix(review_vectorized, **dmatrix_params)
-
     # Predict using the XGBoost model
-    preds = model.predict(dtest)
+    preds = model.predict(review_vectorized)
     predictions = preds.argmax(axis=1)
 
     # Decode the predictions
