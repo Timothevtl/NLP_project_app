@@ -82,10 +82,13 @@ def predict_sentiment_xgboost(review, model, vectorizer, label_encoder):
 
     # Predict using the XGBoost model
     preds = model.predict(review_vectorized)
-    predictions = preds.argmax(axis=1)
 
-    # Decode the predictions
-    decoded_predictions = label_encoder.inverse_transform(predictions)
+    # For binary classification, XGBoost returns a single probability per instance
+    # We assume that the positive class is labeled 1 and the negative class is labeled 0
+    predicted_labels = (preds > 0.5).astype(int)
+
+    # Decode the predictions using the label encoder
+    decoded_predictions = label_encoder.inverse_transform(predicted_labels)
 
     return decoded_predictions[0]
 
