@@ -209,18 +209,18 @@ def main():
             
     elif app_mode == "Sentiment Analysis":
         label_encoder = LabelEncoder().fit(['negative', 'neutral', 'positive'])
+        # Download and unzip the RandomForest model and vectorizer
+        zip_url = "https://github.com/Timothevtl/NLP_repository/raw/main/balanced_tfidf_vectorizer.zip"
+        zip_path = "balanced_tfidf_vectorizer.zip"
+        download_and_unzip(zip_url, zip_path)
+        
+        # Load TF-IDF Vectorizer and Optimized RandomForest Model
+        tfidf_vectorizer = joblib.load("balanced_tfidf_vectorizer.joblib")
         st.title("Sentiment Analysis of Book Reviews")
         # Select a model for analysis
         model_choice = st.selectbox("Select a model for analysis", ["RandomForest", "XGBoost"])
-
+        review_text = st.text_area("Enter the review text here")
         if model_choice == "RandomForest":
-            # Download and unzip the RandomForest model and vectorizer
-            zip_url = "https://github.com/Timothevtl/NLP_repository/raw/main/balanced_tfidf_vectorizer.zip"
-            zip_path = "balanced_tfidf_vectorizer.zip"
-            download_and_unzip(zip_url, zip_path)
-        
-            # Load TF-IDF Vectorizer and Optimized RandomForest Model
-            tfidf_vectorizer = joblib.load("balanced_tfidf_vectorizer.joblib")
             model = joblib.load("balanced_optimized_rf_model.joblib")
             sentiment, score = predict_sentiment(review_text, model, tfidf_vectorizer, label_encoder)
 
@@ -234,8 +234,7 @@ def main():
             # Load the XGBoost model
             model = xgb.XGBClassifier()
             model.load_model(xgboost_model_path)
-            predicted_sentiment = predict_sentiment_xgboost(review_text, bst, vectorizer, label_encoder)
-        review_text = st.text_area("Enter the review text here")
+            sentiment = predict_sentiment_xgboost(review_text, model, tfidf_vectorizer, label_encoder)
         if st.button("Analyze Sentiment"):
             st.write("Sentiment:", sentiment)
             if score:
