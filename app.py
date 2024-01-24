@@ -182,6 +182,18 @@ def main():
     }
     current_state = "Home"
     app_mode = st.sidebar.radio("Go to", list(app_states.keys()))
+    if st.button("Try our book review sentiment analysis model"):
+        app_mode = "Sentiment Analysis"
+    
+    if st.button("Or get a book recommendation from our top 1000 best books !"):
+        app_mode == "Book recommendation"
+    
+    if st.button("You want to know more about the content of a specific book? Ask our Question Answering model"):
+        app_mode = "Question Answering"
+
+    if st.button("Want to know relation between words? Try the semantic research !"):
+        app_mode = "Semantic Search"
+        
     if app_mode == "Book recommendation":
         tfidf_vectorizer_similar_book = TfidfVectorizer(stop_words='english')
         book_df = load_csv_from_github('https://raw.githubusercontent.com/Timothevtl/NLP_project_app/main/book_df.csv')
