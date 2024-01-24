@@ -226,10 +226,10 @@ def main():
             model = xgb.XGBClassifier()
             model.load_model(xgboost_model_path)
             sentiment = predict_sentiment_xgboost(review_text, model, tfidf_vectorizer, label_encoder)
+            score = None
         if st.button("Analyze Sentiment"):
             st.write("Sentiment:", sentiment)
-            if score:
-                st.write("Confidence Score:", score)
+            st.write("Confidence Score:", score)
 
     elif app_mode == "Semantic Search":
         st.title("Semantic Search with Word2Vec")
