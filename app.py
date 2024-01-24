@@ -144,13 +144,20 @@ def download_file(url, filename):
         response.raise_for_status()
 
 def interactive_qa_t5(df, new_tfidf_vectorizer, new_tfidf_matrix, qa_pipeline):
-    book_name = st.text_input("Enter a book name to ask about:").strip()
+    example_books = df['book_name'].dropna().unique()[:5]  # Adjust the number of examples as needed
+    example_book = st.selectbox("Or select an example book:", [''] + list(example_books))
 
+    # Text input for entering or confirming the book name
+    book_name = st.text_input("Enter a book name to ask about:", value=example_book).strip()
+    book_names_list = []
+    for i in df['book_name'].values:
+        book_names_list.append(i.lower())
+    
     if book_name:
         if book_name.lower() == 'exit':
             st.stop()
 
-        if book_name not in df['book_name'].values:
+        if book_name.lower() not in book_names_list:
             closest_books = find_closest_books(book_name, new_tfidf_vectorizer, new_tfidf_matrix, df, top_n=5)
             st.write("Did you mean one of these books?")
             for name in closest_books:
