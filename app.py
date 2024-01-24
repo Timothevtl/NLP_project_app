@@ -147,8 +147,7 @@ def interactive_qa_t5(df, new_tfidf_vectorizer, new_tfidf_matrix, qa_pipeline):
     book_name = st.text_input("Enter a book name to ask about:").strip()
 
     example_books = random.sample(list(df['book_name'].dropna().unique()), 5)  # Select 5 random books
-    example_book = st.selectbox("Or select from these example books:", [''] + example_books)
-    if example_book:
+    if st.selectbox("Or select from these example books:", [''] + example_books)
         book_name = example_book
     book_names_list = []
     for i in df['book_name'].values:
