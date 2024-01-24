@@ -117,7 +117,7 @@ def semantic_search(model, search_term, top_n=5):
         
             return sorted(similarities, key=lambda item: -item[1])[:top_n]
         else:
-            return ['Your research didn\'t bring any results, try again']
+            return ['Your research didn\'t bring any results, try again', 0]
     similarities = []
     for word in model.wv.index_to_key:
         if word == search_term:
