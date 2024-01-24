@@ -169,15 +169,15 @@ def interactive_qa_t5(df, new_tfidf_vectorizer, new_tfidf_matrix, qa_pipeline):
 
 # Main
 def main():
-    st.sidebar.title("Navigation")
-    app_mode = st.sidebar.radio("Go to", ["Home", "Sentiment Analysis", "Semantic Search", "Question Answering", "Book recommendation"])
     app_mode = "Home"
     if app_mode == "Home":
         st.title("Welcome to the NLP Project 2 App")
         st.title(":books: Book Analysis and recommandation models :books:")
         st.write("Created by Anna ZENOU and Timothe VITAL")
         st.write("Explore book reviews, get recommendations, and ask questions about your favorite books.")
-
+    
+    st.sidebar.title("Navigation")
+    app_mode = st.sidebar.radio("Go to", ["Home", "Sentiment Analysis", "Semantic Search", "Question Answering", "Book recommendation"])
     
     
     if app_mode == "Book recommendation":
