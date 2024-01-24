@@ -172,9 +172,16 @@ def main():
     st.title(":books: Welcome to the NLP Project 2 App : Book Analysis and recommandation models :books:")
     st.write("Created by Anna ZENOU and Timothe VITAL")
 
-    
     st.sidebar.title("Navigation")
-    app_mode = st.sidebar.radio("Go to", ["Home", "Sentiment Analysis", "Semantic Search", "Question Answering", "Book recommendation"])
+    app_states = {
+        "Home": "Home",
+        "Sentiment Analysis": "Sentiment Analysis",
+        "Semantic Search": "Semantic Search",
+        "Question Answering": "Question Answering",
+        "Book Recommendation": "Book Recommendation"
+    }
+    current_state = "Home"
+    app_mode = st.sidebar.radio("Go to", list(app_states.keys()))
     if app_mode == "Book recommendation":
         tfidf_vectorizer_similar_book = TfidfVectorizer(stop_words='english')
         book_df = load_csv_from_github('https://raw.githubusercontent.com/Timothevtl/NLP_project_app/main/book_df.csv')
