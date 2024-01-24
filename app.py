@@ -238,7 +238,7 @@ def main():
                 try:
                     result, similar_words = semantic_search(word2vec_model, search_term, top_n=10)
                 except:
-                    search_term = find_closest_word(model, word)
+                    search_term = find_closest_word(word2vec_model, word)
                 if st.button(f"Did you mean '{search_term}'?"):
                     result, similar_words = semantic_search(word2vec_model, search_term, top_n=10)
                     df = pd.DataFrame(similar_words, columns=["Word", "Similarity Score"])
