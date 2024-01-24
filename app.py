@@ -96,12 +96,7 @@ def semantic_search(model, search_term, top_n=5):
     try:
         search_term_vector = model.wv[search_term]
     except:
-        st.write('The typed word is not present in the model vocabulary')
-        st.write('Did you missplell? Try typing a unique word again')
-        search_term = st.text_input("Enter a word for semantic search")
-        if st.button("Search"):
-            similar_words = semantic_search(word2vec_model, search_term, top_n=10)
-        
+        return None
     similarities = []
     for word in model.wv.index_to_key:
         if word == search_term:
@@ -234,8 +229,12 @@ def main():
         search_term = st.text_input("Enter a word for semantic search")
         if st.button("Search"):
             similar_words = semantic_search(word2vec_model, search_term, top_n=10)
-            df = pd.DataFrame(similar_words, columns=["Word", "Similarity Score"])
-            st.table(df)
+            if similar_words:
+                df = pd.DataFrame(similar_words, columns=["Word", "Similarity Score"])
+                st.table(df)
+            else:
+                st.write('The prompted work is not present in the model vocabulary')
+                st.write('you might have misspelled? in any case, try typing another word')
 
     elif app_mode == "Question Answering":
         st.title("Question Answering with BART")
