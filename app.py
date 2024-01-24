@@ -93,7 +93,11 @@ def load_csv_from_github(url):
         response.raise_for_status()
 
 def semantic_search(model, search_term, top_n=5):
-    search_term_vector = model.wv[search_term]
+    try:
+        search_term_vector = model.wv[search_term]
+    except:
+        result = find_closest_word(model, search_term)
+        search_term_vector = model.wv[result]
     similarities = []
     for word in model.wv.index_to_key:
         if word == search_term:
