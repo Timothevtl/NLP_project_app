@@ -169,9 +169,23 @@ def interactive_qa_t5(df, new_tfidf_vectorizer, new_tfidf_matrix, qa_pipeline):
 
 # Main
 def main():
-    st.title(":books: Welcome to the NLP Project 2 App : Book Analysis and recommandation models :books:")
+    app_states = {
+        "Home": "home",
+        "Sentiment Analysis": "sentiment",
+        "Semantic Search": "semantic",
+        "Question Answering": "qa",
+        "Book Recommendation": "recommendation"
+    }
+
+    # Initialize the current state as HOME
+    current_state = "Home"
+    app_title = "Welcome to the NLP Project 2 App"
+    st.markdown(
+        f'<h1 style="text-align: left; margin-left: 0;">{app_title}</h1>',
+        unsafe_allow_html=True
+    )
+    st.title(":books: Book Analysis and recommandation models :books:")
     st.write("Created by Anna ZENOU and Timothe VITAL")
-    st.write("Explore book reviews, get recommendations, and ask questions about your favorite books.")
 
     
     st.sidebar.title("Navigation")
@@ -179,18 +193,20 @@ def main():
     st.write("Explore book reviews, get recommendations, and ask questions about your favorite books.")
     # Add buttons or links to different app sections
     if st.button("Try our book review sentiment analysis model"):
-        app_mode = "Sentiment Analysis"
+        current_state  = "Sentiment Analysis"
     
     if st.button("Or get a book recommendation from our top 1000 best books !"):
-        app_mode == "Book recommendation"
+        current_state  = "Book recommendation"
     
     if st.button("You want to know more about the content of a specific book? Ask our Question Answering model"):
-        app_mode = "Question Answering"
+        current_state  = "Question Answering"
 
     if st.button("Want to know relation between words? Try the semantic research !"):
-        app_mode = "Semantic Search"
+        current_state  = "Semantic Search"
+        
+    st.experimental_set_query_params(state=app_states[current_state])
     
-    if app_mode == "Book recommendation":
+    if current_state == "Book recommendation":
         tfidf_vectorizer_similar_book = TfidfVectorizer(stop_words='english')
         book_df = load_csv_from_github('https://raw.githubusercontent.com/Timothevtl/NLP_project_app/main/book_df.csv')
         tfidf_matrix_similar_book = tfidf_vectorizer_similar_book.fit_transform(book_df['cleaned_summary'])
@@ -201,7 +217,7 @@ def main():
                 with st.expander(f"{book} (Similarity Score: {score}, Rating: {rating})"):
                     st.write(f"Summary: {summary}")
             
-    elif app_mode == "Sentiment Analysis":
+    elif current_state == "Sentiment Analysis":
         label_encoder = LabelEncoder().fit(['negative', 'neutral', 'positive'])
         st.title("Sentiment Analysis of Book Reviews")
         model_choice = st.selectbox("Select a model for analysis", ["RandomForest"])
@@ -223,7 +239,7 @@ def main():
             st.write("Sentiment:", sentiment)
             st.write("Confidence Score:", score)
 
-    elif app_mode == "Semantic Search":
+    elif current_state == "Semantic Search":
         st.title("Semantic Search with Word2Vec")
         choice = st.selectbox("Select a word2vec model", ["trained on 1000 book summaries", "trained on 60 000 user reviews"])
         if choice == "trained on 1000 book summaries":
@@ -262,7 +278,7 @@ def main():
                 st.write('The prompted word is not present in the model\'s vocabulary')
                 st.write('you might have misspelled? In any case, try typing another word')
 
-    elif app_mode == "Question Answering":
+    elif current_state == "Question Answering":
         st.title("Question Answering with BART")
 
         # Display a message while loading the model
