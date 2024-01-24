@@ -201,7 +201,7 @@ def main():
         
         # URL of the zipped file
         zip_url = "https://github.com/Timothevtl/NLP_repository/raw/main/balanced_tfidf_vectorizer.zip"
-        zip_path = "https://github.com/Timothevtl/NLP_repository/raw/main/balanced_tfidf_vectorizer.zip"
+        zip_path = "balanced_tfidf_vectorizer.zip"
 
         # Download and unzip
         download_and_unzip(zip_url, zip_path)
