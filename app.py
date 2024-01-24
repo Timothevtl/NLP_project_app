@@ -51,6 +51,7 @@ def download_and_unzip(url, zip_path, extract_to='.'):
     if not os.path.exists(zip_path):
         # Download the zip file
         response = requests.get(url, stream=True)
+        print(f"Downloading file from: {url}")
         if response.status_code == 200:
             with open(zip_path, 'wb') as f:
                 f.write(response.content)
@@ -58,8 +59,12 @@ def download_and_unzip(url, zip_path, extract_to='.'):
             response.raise_for_status()
 
     # Unzip the file
-    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-        zip_ref.extractall(extract_to)
+    try:
+        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+            zip_ref.extractall(extract_to)
+    except zipfile.BadZipFile:
+        print(f"Error: The file at {os.path.abspath(zip_path)} is not a zip file or is corrupted.")
+        raise
 
 # Function to predict sentiment
 def predict_sentiment(review, model, vectorizer, label_encoder):
