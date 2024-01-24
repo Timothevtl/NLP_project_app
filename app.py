@@ -76,11 +76,26 @@ def predict_sentiment(review, model, vectorizer, label_encoder):
     return prediction_label, score
 
 def predict_sentiment_xgboost(review, model, vectorizer, label_encoder):
+    # Clean and vectorize the review
     review_cleaned = clean_text(review)
     review_vectorized = vectorizer.transform([review_cleaned])
-    preds = model.predict(review_vectorized)
-    predicted_labels = (preds > 0).astype(int)
-    decoded_predictions = label_encoder.inverse_transform(predicted_labels)
+
+    # Convert to DMatrix
+    dtest = xgb.DMatrix(review_vectorized)
+
+    # Predict using the XGBoost model
+    preds = model.predict(dtest)
+
+    # If the model outputs probabilities for each class
+    if preds.ndim > 1 and preds.shape[1] > 1:
+        predictions = preds.argmax(axis=1)
+    else:
+        # For binary classification, XGBoost outputs probabilities for positive class
+        predictions = (preds > 0.5).astype(int)
+
+    # Decode the predictions
+    decoded_predictions = label_encoder.inverse_transform(predictions)
+
     return decoded_predictions[0]
 
 def download_file_from_github(file_url, file_name):
@@ -261,7 +276,7 @@ def main():
         # UI elements for semantic search
         search_term = st.text_input("Enter a word for semantic search")
         if st.button("Search"):
-            similar_words = semantic_search(word2vec_model, search_term, top_n=10)
+            similar_words = semantic_search(word2vec_model, search_term.lower(), top_n=10)
             if similar_words:
                 df = pd.DataFrame(similar_words, columns=["Word", "Similarity Score"])
                 st.write('Here are the top 10 closest words to', search_term,'from the user book reviews')
