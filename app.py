@@ -144,11 +144,14 @@ def download_file(url, filename):
         response.raise_for_status()
 
 def interactive_qa_t5(df, new_tfidf_vectorizer, new_tfidf_matrix, qa_pipeline):
-    example_books = df['book_name'].dropna().unique()[:5]  # Adjust the number of examples as needed
-    example_book = st.selectbox("Or select an example book:", [''] + list(example_books))
+    book_name = st.text_input("Enter a book name to ask about:").strip()
 
-    # Text input for entering or confirming the book name
-    book_name = st.text_input("Enter a book name to ask about:", value=example_book).strip()
+    # If the user hasn't entered a book name yet, show a dropdown with random book examples
+    if not book_name:
+        example_books = random.sample(list(df['book_name'].dropna().unique()), 5)  # Select 5 random books
+        example_book = st.selectbox("Or select from these example books:", [''] + example_books)
+        if example_book:
+            book_name = example_book
     book_names_list = []
     for i in df['book_name'].values:
         book_names_list.append(i.lower())
