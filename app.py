@@ -76,20 +76,17 @@ def predict_sentiment(review, model, vectorizer, label_encoder):
     return prediction_label, score
 
 def predict_sentiment_xgboost(review, model, vectorizer, label_encoder):
-    prediction = ''
     review_cleaned = clean_text(review)
     review_vectorized = vectorizer.transform([review_cleaned])
+
     preds = model.predict(review_vectorized)
-    prediction = preds.argmax()
-    st.write(preds)
-    st.write(prediction)
-    if str(prediction) == '0':
-        prediction = 'Negative'
-    elif str(prediction) == '1':
-        prediction = 'Neutral'
-    elif str(prediction) == '2':
-        prediction = 'Positive'
-    return prediction
+    if len(preds.shape) > 1 and preds.shape[1] > 1:
+        prediction_index = preds.argmax(axis=1)[0]
+    else:
+        prediction_index = int(preds[0] > 0.5)
+    predicted_label = label_encoder.inverse_transform([prediction_index])[0]
+
+    return predicted_label
 
 def download_file_from_github(file_url, file_name):
     response = requests.get(file_url)
@@ -133,16 +130,9 @@ def answer_question(question, context, qa_pipeline):
     return result['answer']
 
 def find_closest_books(input_name, new_tfidf_vectorizer, new_tfidf_matrix,book_df, top_n=3):
-    # Vectorize the input using the same TF-IDF vectorizer
     input_vector = new_tfidf_vectorizer.transform([input_name])
-
-    # Compute cosine similarity between the input and all book names
     cosine_similarities = cosine_similarity(input_vector, new_tfidf_matrix).flatten()
-
-    # Get the indices of the top_n closest books
     closest_indices = np.argsort(-cosine_similarities)[:top_n]
-
-    # Get the names of the top_n closest books
     closest_books = book_df['book_name'].iloc[closest_indices].tolist()
     return closest_books
 
@@ -177,7 +167,6 @@ def interactive_qa_t5(df, new_tfidf_vectorizer, new_tfidf_matrix, qa_pipeline):
             for name in closest_books:
                 st.write(f"- {name}")
 
-            # User can then modify their input based on suggestions
             st.write("Please enter the correct book name in the input box above (or type 'exit' to quit).")
         else:
             summary = df[df['book_name'] == book_name]['cleaned_summary'].iloc[0]
@@ -208,12 +197,10 @@ def main():
             
     elif app_mode == "Sentiment Analysis":
         label_encoder = LabelEncoder().fit(['negative', 'neutral', 'positive'])
-        # Download and unzip the RandomForest model and vectorizer
         zip_url = "https://github.com/Timothevtl/NLP_repository/raw/main/balanced_tfidf_vectorizer.zip"
         zip_path = "balanced_tfidf_vectorizer.zip"
         download_and_unzip(zip_url, zip_path)
         
-        # Load TF-IDF Vectorizer and Optimized RandomForest Model
         tfidf_vectorizer = joblib.load("balanced_tfidf_vectorizer.joblib")
         st.title("Sentiment Analysis of Book Reviews")
         # Select a model for analysis
@@ -224,13 +211,11 @@ def main():
             sentiment, score = predict_sentiment(review_text, model, tfidf_vectorizer, label_encoder)
 
         elif model_choice == "XGBoost":
-            # Download XGBoost model
             xgboost_model_url = "https://github.com/Timothevtl/NLP_project_app/raw/main/xgboost_model.json"
             xgboost_model_path = "xgboost_model.json"
             if not os.path.exists(xgboost_model_path):
                 download_file(xgboost_model_url, xgboost_model_path)
         
-            # Load the XGBoost model
             model = xgb.XGBClassifier()
             model.load_model(xgboost_model_path)
             sentiment = predict_sentiment_xgboost(review_text, model, tfidf_vectorizer, label_encoder)
@@ -266,7 +251,6 @@ def main():
             # Load the model from the downloaded files
             word2vec_model = Word2Vec.load("word2vec_finetuned.model")
     
-        # UI elements for semantic search
         search_term = st.text_input("Enter a word for semantic search")
         if st.button("Search"):
             similar_words = semantic_search(word2vec_model, search_term.lower(), top_n=10)
@@ -281,11 +265,9 @@ def main():
     elif app_mode == "Question Answering":
         st.title("Question Answering with BART")
 
-        # Display a message while loading the model
         with st.spinner('Loading Question Answering model...'):
             qa_pipeline = load_qa_pipeline()
 
-        # Load and display the dataset (with caching to avoid re-loading)
         book_df = load_csv_from_github('https://raw.githubusercontent.com/Timothevtl/NLP_project_app/main/book_df.csv')
         new_tfidf_vectorizer = TfidfVectorizer()
         new_tfidf_matrix = new_tfidf_vectorizer.fit_transform(book_df['book_name'])
