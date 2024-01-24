@@ -169,9 +169,27 @@ def interactive_qa_t5(df, new_tfidf_vectorizer, new_tfidf_matrix, qa_pipeline):
 
 # Main
 def main():
-    st.title("Book Analysis Application")
+    app_title = ":books: Welcome to the NLP Project 2 App : Book Analysis and recommandation models :books:"
+    st.write("Created by Anna ZENOU and Timothe VITAL")
+    st.write("Explore book reviews, get recommendations, and ask questions about your favorite books.")
+
+    
     st.sidebar.title("Navigation")
     app_mode = st.sidebar.radio("Go to", ["Home", "Sentiment Analysis", "Semantic Search", "Question Answering", "Book recommendation"])
+    st.write("Explore book reviews, get recommendations, and ask questions about your favorite books.")
+    # Add buttons or links to different app sections
+    if st.button("Try our book review sentiment analysis model"):
+        app_mode = "Sentiment Analysis"
+    
+    if st.button("Or get a book recommendation from our top 1000 best books !"):
+        app_mode == "Book recommendation"
+    
+    if st.button("You want to know more about the content of a specific book? Ask our Question Answering model"):
+        app_mode = "Question Answering"
+
+    if st.button("Want to know relation between words? Try the semantic research !"):
+        app_mode = "Semantic Search"
+    
     if app_mode == "Book recommendation":
         tfidf_vectorizer_similar_book = TfidfVectorizer(stop_words='english')
         book_df = load_csv_from_github('https://raw.githubusercontent.com/Timothevtl/NLP_project_app/main/book_df.csv')
@@ -267,6 +285,7 @@ def main():
             st.write('- Where does the story take place?')
             st.write('- What happens in the book?')
             st.write('- Who are the characters?')
+    
 
 # Run the app
 if __name__ == "__main__":
