@@ -84,7 +84,7 @@ def predict_sentiment_xgboost(review, model, vectorizer, label_encoder):
     else:
         # For binary classification, XGBoost outputs probabilities for positive class
         predictions = (preds > 0.5).astype(int)
-    decoded_predictions = label_encoder.inverse_transform(predicted_labels)
+    decoded_predictions = label_encoder.inverse_transform(predictions)
     return decoded_predictions[0]
 
 def download_file_from_github(file_url, file_name):
