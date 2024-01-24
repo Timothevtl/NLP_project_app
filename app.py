@@ -195,14 +195,14 @@ def main():
 
         
         # URL of the zipped file
-        zip_url = "https://github.com/Timothevtl/NLP_repository/raw/main/"
-        zip_path = "balanced_tfidf_vectorizer_2.zip"
+        zip_url = "https://github.com/Timothevtl/NLP_repository/raw/main/balanced_tfidf_vectorizer.zip"
+        zip_path = "balanced_tfidf_vectorizer.zip"
 
         # Download and unzip
         download_and_unzip(zip_url, zip_path)
 
         # Load TF-IDF Vectorizer and Optimized RandomForest Model
-        tfidf_vectorizer = joblib.load("balanced_tfidf_vectorizer_2.joblib")
+        tfidf_vectorizer = joblib.load("balanced_tfidf_vectorizer.joblib")
         model = joblib.load("balanced_optimized_rf_model.joblib")
         review_text = st.text_area("Enter the review text here")
         if st.button("Analyze Sentiment"):
