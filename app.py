@@ -51,7 +51,6 @@ def download_and_unzip(url, zip_path, extract_to='.'):
     if not os.path.exists(zip_path):
         # Download the zip file
         response = requests.get(url, stream=True)
-        st.write(f"Downloading file from:", {url})
         if response.status_code == 200:
             with open(zip_path, 'wb') as f:
                 f.write(response.content)
