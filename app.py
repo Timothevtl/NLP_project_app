@@ -93,21 +93,16 @@ def load_csv_from_github(url):
         response.raise_for_status()
 
 def semantic_search(model, search_term, top_n=5):
-    if search_term not in model.wv:
-        closest_word = find_closest_word(model, search_term)
-        return closest_word, None
-
     search_term_vector = model.wv[search_term]
     similarities = []
     for word in model.wv.index_to_key:
         if word == search_term:
             continue
         word_vector = model.wv[word]
-        sim = cosine_similarity([search_term_vector], [word_vector])[0][0]
-        similarities.append((word, sim))
+        sim = cosine_similarity([search_term_vector], [word_vector])
+        similarities.append((word, sim[0][0]))
 
-    similarities.sort(key=lambda x: x[1], reverse=True)
-    return search_term, similarities[:top_n]
+    return sorted(similarities, key=lambda item: -item[1])[:top_n]
 
 def find_closest_word(model, word):
     word_vector = np.array([model.wv.get_vector(w) for w in model.wv.index_to_key])
@@ -236,13 +231,12 @@ def main():
     
             search_term = st.text_input("Enter a word for semantic search")
             if st.button("Search"):
-                result, similar_words = semantic_search(word2vec_model, search_term, top_n=10)
-            
-                if similar_words is None:  # Suggested word for a misspelling
-                    if st.button(f"Did you mean '{result}'?"):
-                        result, similar_words = semantic_search(word2vec_model, result, top_n=10)
-            
-                if similar_words is not None:
+                try:
+                    result, similar_words = semantic_search(word2vec_model, search_term, top_n=10)
+                except:
+                    search_term = find_closest_word(model, word)
+                if st.button(f"Did you mean '{search_term}'?"):
+                    result, similar_words = semantic_search(word2vec_model, search_term, top_n=10)
                     df = pd.DataFrame(similar_words, columns=["Word", "Similarity Score"])
                     st.table(df)
 
