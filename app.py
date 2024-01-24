@@ -76,20 +76,11 @@ def predict_sentiment(review, model, vectorizer, label_encoder):
     return prediction_label, score
 
 def predict_sentiment_xgboost(review, model, vectorizer, label_encoder):
-    # Clean and vectorize the review
     review_cleaned = clean_text(review)
     review_vectorized = vectorizer.transform([review_cleaned])
-
-    # Predict using the XGBoost model
     preds = model.predict(review_vectorized)
-
-    # For binary classification, XGBoost returns a single probability per instance
-    # We assume that the positive class is labeled 1 and the negative class is labeled 0
     predicted_labels = (preds > 0.5).astype(int)
-
-    # Decode the predictions using the label encoder
     decoded_predictions = label_encoder.inverse_transform(predicted_labels)
-
     return decoded_predictions[0]
 
 def download_file_from_github(file_url, file_name):
