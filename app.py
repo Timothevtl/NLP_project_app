@@ -75,6 +75,23 @@ def predict_sentiment(review, model, vectorizer, label_encoder):
     score = prediction_proba[prediction_index]
     return prediction_label, score
 
+def predict_sentiment_xgboost(review, model, vectorizer, label_encoder, dmatrix_params={}):
+    # Clean and vectorize the review
+    review_cleaned = clean_text(review)
+    review_vectorized = vectorizer.transform([review_cleaned])
+
+    # Convert to DMatrix, which XGBoost uses
+    dtest = xgb.DMatrix(review_vectorized, **dmatrix_params)
+
+    # Predict using the XGBoost model
+    preds = model.predict(dtest)
+    predictions = preds.argmax(axis=1)
+
+    # Decode the predictions
+    decoded_predictions = label_encoder.inverse_transform(predictions)
+
+    return decoded_predictions[0]
+
 def download_file_from_github(file_url, file_name):
     response = requests.get(file_url)
     if response.status_code == 200:
@@ -193,24 +210,36 @@ def main():
     elif app_mode == "Sentiment Analysis":
         label_encoder = LabelEncoder().fit(['negative', 'neutral', 'positive'])
         st.title("Sentiment Analysis of Book Reviews")
-        model_choice = st.selectbox("Select a model for analysis", ["RandomForest"])
+        # Select a model for analysis
+        model_choice = st.selectbox("Select a model for analysis", ["RandomForest", "XGBoost"])
 
+        if model_choice == "RandomForest":
+            # Download and unzip the RandomForest model and vectorizer
+            zip_url = "https://github.com/Timothevtl/NLP_repository/raw/main/balanced_tfidf_vectorizer.zip"
+            zip_path = "balanced_tfidf_vectorizer.zip"
+            download_and_unzip(zip_url, zip_path)
         
-        # URL of the zipped file
-        zip_url = "https://github.com/Timothevtl/NLP_repository/raw/main/balanced_tfidf_vectorizer.zip"
-        zip_path = "balanced_tfidf_vectorizer.zip"
+            # Load TF-IDF Vectorizer and Optimized RandomForest Model
+            tfidf_vectorizer = joblib.load("balanced_tfidf_vectorizer.joblib")
+            model = joblib.load("balanced_optimized_rf_model.joblib")
+            sentiment, score = predict_sentiment(review_text, model, tfidf_vectorizer, label_encoder)
 
-        # Download and unzip
-        download_and_unzip(zip_url, zip_path)
-
-        # Load TF-IDF Vectorizer and Optimized RandomForest Model
-        tfidf_vectorizer = joblib.load("balanced_tfidf_vectorizer.joblib")
-        model = joblib.load("balanced_optimized_rf_model.joblib")
+        elif model_choice == "XGBoost":
+            # Download XGBoost model
+            xgboost_model_url = "https://github.com/Timothevtl/NLP_project_app/raw/main/xgboost_model.json"
+            xgboost_model_path = "xgboost_model.json"
+            if not os.path.exists(xgboost_model_path):
+                download_file(xgboost_model_url, xgboost_model_path)
+        
+            # Load the XGBoost model
+            model = xgb.XGBClassifier()
+            model.load_model(xgboost_model_path)
+            predicted_sentiment = predict_sentiment_xgboost(review_text, bst, vectorizer, label_encoder)
         review_text = st.text_area("Enter the review text here")
         if st.button("Analyze Sentiment"):
-            sentiment, score = predict_sentiment(review_text, model, tfidf_vectorizer, label_encoder)
             st.write("Sentiment:", sentiment)
-            st.write("Confidence Score:", score)
+            if score:
+                st.write("Confidence Score:", score)
 
     elif app_mode == "Semantic Search":
         st.title("Semantic Search with Word2Vec")
