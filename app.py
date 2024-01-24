@@ -80,7 +80,7 @@ def predict_sentiment_xgboost(review, model, vectorizer, label_encoder):
     review_cleaned = clean_text(review)
     review_vectorized = vectorizer.transform([review_cleaned])
     preds = model.predict(review_vectorized)
-    prediction = preds.argmax(axis=1)
+    prediction = preds.argmax(axis=0)
     st.write(prediction)
     if str(prediction) == '0':
         prediction = 'Negative'
