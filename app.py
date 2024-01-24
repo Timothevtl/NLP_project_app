@@ -76,6 +76,7 @@ def predict_sentiment(review, model, vectorizer, label_encoder):
     return prediction_label, score
 
 def predict_sentiment_xgboost(review, model, vectorizer, label_encoder):
+    prediction = ''
     review_cleaned = clean_text(review)
     review_vectorized = vectorizer.transform([review_cleaned])
     preds = model.predict(review_vectorized)
