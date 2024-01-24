@@ -18,6 +18,7 @@ import torch
 from sklearn.feature_extraction.text import TfidfVectorizer
 from io import StringIO
 import zipfile
+import random
 
 def get_english_stopwords():
     nltk.download('stopwords')
