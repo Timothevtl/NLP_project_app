@@ -79,14 +79,13 @@ def predict_sentiment_xgboost(review, model, vectorizer, label_encoder):
     review_cleaned = clean_text(review)
     review_vectorized = vectorizer.transform([review_cleaned])
     preds = model.predict(review_vectorized)
-    st.write(preds)
-    if preds.ndim > 1 and preds.shape[1] > 1:
-        predictions = preds.argmax(axis=1)
-    else:
-        # For binary classification, XGBoost outputs probabilities for positive class
-        predictions = (preds > 0.5).astype(int)
-    decoded_predictions = label_encoder.inverse_transform(predictions)
-    return decoded_predictions[0]
+    if str(preds) == '0':
+        prediction = 'Negative'
+    elif str(preds) == '1':
+        prediction = 'Neutral'
+    elif str(preds) == '2':
+        prediction = 'Positive'
+    return prediction
 
 def download_file_from_github(file_url, file_name):
     response = requests.get(file_url)
