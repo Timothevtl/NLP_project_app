@@ -169,20 +169,19 @@ def interactive_qa_t5(df, new_tfidf_vectorizer, new_tfidf_matrix, qa_pipeline):
 
 # Main
 def main():
-    st.title("Welcome to the NLP Project 2 App")
-    st.title(":books: Book Analysis and recommandation models :books:")
-    st.write("Created by Anna ZENOU and Timothe VITAL")
-    st.write("Explore book reviews, get recommendations, and ask questions about your favorite books.")
+    compteur = 1
+    if compteur == 1:
+        st.title("Welcome to the NLP Project 2 App")
+        st.title(":books: Book Analysis and recommandation models :books:")
+        st.write("Created by Anna ZENOU and Timothe VITAL")
+        st.write("Explore book reviews, get recommendations, and ask questions about your favorite books.")
+        compteur += 1
 
     
     st.sidebar.title("Navigation")
     app_mode = st.sidebar.radio("Go to", ["Home", "Sentiment Analysis", "Semantic Search", "Question Answering", "Book recommendation"])
     
     if app_mode == "Book recommendation":
-        placeholder = st.empty()
-
-        # Clear the page by updating the empty element
-        placeholder.clear()
         tfidf_vectorizer_similar_book = TfidfVectorizer(stop_words='english')
         book_df = load_csv_from_github('https://raw.githubusercontent.com/Timothevtl/NLP_project_app/main/book_df.csv')
         tfidf_matrix_similar_book = tfidf_vectorizer_similar_book.fit_transform(book_df['cleaned_summary'])
