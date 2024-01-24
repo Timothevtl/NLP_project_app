@@ -79,6 +79,7 @@ def predict_sentiment_xgboost(review, model, vectorizer, label_encoder):
     review_cleaned = clean_text(review)
     review_vectorized = vectorizer.transform([review_cleaned])
     preds = model.predict(review_vectorized)
+    st.write(preds)
     if preds.ndim > 1 and preds.shape[1] > 1:
         predictions = preds.argmax(axis=1)
     else:
