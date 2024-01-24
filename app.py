@@ -92,12 +92,32 @@ def load_csv_from_github(url):
     else:
         response.raise_for_status()
 
+def find_closest_word(model, word):
+    word_vector = np.array([model.wv.get_vector(w) for w in model.wv.index_to_key])
+    misspelled_vec = np.array([np.mean([model.wv.get_vector(c) for c in word if c in model.wv.key_to_index], axis=0)])
+    similarities = cosine_similarity(misspelled_vec, word_vector)[0]
+    closest_word = model.wv.index_to_key[np.argmax(similarities)]
+    return closest_word
+
 def semantic_search(model, search_term, top_n=5):
     try:
         search_term_vector = model.wv[search_term]
     except:
-        result = find_closest_word(model, search_term)
-        search_term_vector = model.wv[result]
+        search_term = find_closest_word(model, search_term)
+        st.write('Word not present in the model vocabulary')
+        st.write('Did you mean :',search_term, "?")
+        if st.button('yes'):
+            similarities = []
+            for word in model.wv.index_to_key:
+                if word == search_term:
+                    continue
+                word_vector = model.wv[word]
+                sim = cosine_similarity([search_term_vector], [word_vector])
+                similarities.append((word, sim[0][0]))
+        
+            return sorted(similarities, key=lambda item: -item[1])[:top_n]
+        else:
+            return ['Your research didn\'t bring any results, try again']
     similarities = []
     for word in model.wv.index_to_key:
         if word == search_term:
@@ -107,13 +127,6 @@ def semantic_search(model, search_term, top_n=5):
         similarities.append((word, sim[0][0]))
 
     return sorted(similarities, key=lambda item: -item[1])[:top_n]
-
-def find_closest_word(model, word):
-    word_vector = np.array([model.wv.get_vector(w) for w in model.wv.index_to_key])
-    misspelled_vec = np.array([np.mean([model.wv.get_vector(c) for c in word if c in model.wv.key_to_index], axis=0)])
-    similarities = cosine_similarity(misspelled_vec, word_vector)[0]
-    closest_word = model.wv.index_to_key[np.argmax(similarities)]
-    return closest_word
 
 def answer_question(question, context, qa_pipeline):
     result = qa_pipeline({'question': question, 'context': context})
@@ -233,16 +246,12 @@ def main():
             # Load the model from the downloaded files
             word2vec_model = Word2Vec.load("word2vec_finetuned.model")
     
-            search_term = st.text_input("Enter a word for semantic search")
-            if st.button("Search"):
-                try:
-                    similar_words = semantic_search(word2vec_model, search_term, top_n=10)
-                except:
-                    search_term = find_closest_word(word2vec_model, word)
-                if st.button(f"Did you mean '{search_term}'?"):
-                    similar_words = semantic_search(word2vec_model, search_term, top_n=10)
-                    df = pd.DataFrame(similar_words, columns=["Word", "Similarity Score"])
-                    st.table(df)
+        # UI elements for semantic search
+        search_term = st.text_input("Enter a word for semantic search")
+        if st.button("Search"):
+            similar_words = semantic_search(word2vec_model, search_term, top_n=10)
+            df = pd.DataFrame(similar_words, columns=["Word", "Similarity Score"])
+            st.table(df)
 
     elif app_mode == "Question Answering":
         st.title("Question Answering with BART")
