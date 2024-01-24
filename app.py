@@ -176,8 +176,6 @@ def main():
     
     st.sidebar.title("Navigation")
     app_mode = st.sidebar.radio("Go to", ["Home", "Sentiment Analysis", "Semantic Search", "Question Answering", "Book recommendation"])
-    st.title("")  # Clear the title
-    st.write("")
     
     if app_mode == "Book recommendation":
         tfidf_vectorizer_similar_book = TfidfVectorizer(stop_words='english')
