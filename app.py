@@ -208,10 +208,16 @@ def main():
         st.title("Semantic Search with Word2Vec")
         choice = st.selectbox("Select a word2vec model", ["trained on 1000 book summaries", "trained on 60 000 user reviews"])
         if choice == "trained on 1000 book summaries":
+            if st.button('Information about the model'):
+                st.write('This model was trained on the top 1000 most commented and best rated book summaries found on goodreads.com')
+                st.write('This model is quite unprecise, because it was trained on too little data')
             model_original_url = "https://github.com/Timothevtl/NLP_project_app/raw/main/word2vec_model.model"
             download_file(model_original_url, "word2vec_model.model")
             word2vec_model = Word2Vec.load("word2vec_model.model")
         elif choice == "trained on 60 000 user reviews":
+            if st.button('Information about the optimized model'):
+                st.write('This model was trained on 60 000 book reviews of users from goodreads.com')
+                st.write('This model is much better than the other one')
             # URLs for the model and .npy files
             model_fined_tuned_url = "https://github.com/Timothevtl/NLP_repository/raw/main/word2vec_finetuned.model"
             npy_file1_url = "https://github.com/Timothevtl/NLP_repository/raw/main/word2vec_finetuned.model.syn1neg.npy"
@@ -231,10 +237,11 @@ def main():
             similar_words = semantic_search(word2vec_model, search_term, top_n=10)
             if similar_words:
                 df = pd.DataFrame(similar_words, columns=["Word", "Similarity Score"])
+                st.write('Here are the top 10 closest words to', search_term,'from the user book reviews')
                 st.table(df)
             else:
-                st.write('The prompted work is not present in the model vocabulary')
-                st.write('you might have misspelled? in any case, try typing another word')
+                st.write('The prompted word is not present in the model\'s vocabulary')
+                st.write('you might have misspelled? In any case, try typing another word')
 
     elif app_mode == "Question Answering":
         st.title("Question Answering with BART")
@@ -247,10 +254,18 @@ def main():
         book_df = load_csv_from_github('https://raw.githubusercontent.com/Timothevtl/NLP_project_app/main/book_df.csv')
         new_tfidf_vectorizer = TfidfVectorizer()
         new_tfidf_matrix = new_tfidf_vectorizer.fit_transform(book_df['book_name'])
-
+            
         answer = interactive_qa_t5(book_df,new_tfidf_vectorizer, new_tfidf_matrix, qa_pipeline)
-        st.write("Answer:", answer)
+        if answer:
+            st.write("Answer:", answer)
 
+        if st.button('Additionnal information'):
+            st.write('This functionnality is based on a pre-trained BART Question Answering model that was fined tuned on 1000 book summaries')
+            st.write('This model is extractive, which means it looks for an answer in its knowledge, but can\'t generate original content')
+            st.write('Don\'t be too precise with your questions, questions that generaly work are for example :')
+            st.write('- Where does the story take place?')
+            st.write('- What happens in the book?')
+            st.write('- Who are the characters?')
 
 # Run the app
 if __name__ == "__main__":
