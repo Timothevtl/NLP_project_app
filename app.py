@@ -93,12 +93,11 @@ def load_csv_from_github(url):
         response.raise_for_status()
 
 def semantic_search(model, search_term, top_n=5):
-    try:
-        search_term_vector = model.wv[search_term]
-    except KeyError:
+    if search_term not in model.wv:
         closest_word = find_closest_word(model, search_term)
         return closest_word, None
 
+    search_term_vector = model.wv[search_term]
     similarities = []
     for word in model.wv.index_to_key:
         if word == search_term:
@@ -235,15 +234,14 @@ def main():
             # Load the model from the downloaded files
             word2vec_model = Word2Vec.load("word2vec_finetuned.model")
     
-            # UI elements for semantic search
             search_term = st.text_input("Enter a word for semantic search")
             if st.button("Search"):
                 result, similar_words = semantic_search(word2vec_model, search_term, top_n=10)
-        
-                if similar_words is None:  # This means a misspelled word was suggested
+            
+                if similar_words is None:  # Suggested word for a misspelling
                     if st.button(f"Did you mean '{result}'?"):
                         result, similar_words = semantic_search(word2vec_model, result, top_n=10)
-    
+            
                 if similar_words is not None:
                     df = pd.DataFrame(similar_words, columns=["Word", "Similarity Score"])
                     st.table(df)
