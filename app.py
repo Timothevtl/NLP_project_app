@@ -169,7 +169,7 @@ def interactive_qa_t5(df, new_tfidf_vectorizer, new_tfidf_matrix, qa_pipeline):
 
 # Main
 def main():
-    app_title = ":books: Welcome to the NLP Project 2 App : Book Analysis and recommandation models :books:"
+    st.title(":books: Welcome to the NLP Project 2 App : Book Analysis and recommandation models :books:")
     st.write("Created by Anna ZENOU and Timothe VITAL")
     st.write("Explore book reviews, get recommendations, and ask questions about your favorite books.")
 
