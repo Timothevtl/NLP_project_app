@@ -93,16 +93,29 @@ def load_csv_from_github(url):
         response.raise_for_status()
 
 def semantic_search(model, search_term, top_n=5):
-    search_term_vector = model.wv[search_term]
+    try:
+        search_term_vector = model.wv[search_term]
+    except KeyError:
+        closest_word = find_closest_word(model, search_term)
+        return closest_word, None
+
     similarities = []
     for word in model.wv.index_to_key:
         if word == search_term:
             continue
         word_vector = model.wv[word]
-        sim = cosine_similarity([search_term_vector], [word_vector])
-        similarities.append((word, sim[0][0]))
+        sim = cosine_similarity([search_term_vector], [word_vector])[0][0]
+        similarities.append((word, sim))
 
-    return sorted(similarities, key=lambda item: -item[1])[:top_n]
+    similarities.sort(key=lambda x: x[1], reverse=True)
+    return search_term, similarities[:top_n]
+
+def find_closest_word(model, word):
+    word_vector = np.array([model.wv.get_vector(w) for w in model.wv.index_to_key])
+    misspelled_vec = np.array([np.mean([model.wv.get_vector(c) for c in word if c in model.wv.key_to_index], axis=0)])
+    similarities = cosine_similarity(misspelled_vec, word_vector)[0]
+    closest_word = model.wv.index_to_key[np.argmax(similarities)]
+    return closest_word
 
 def answer_question(question, context, qa_pipeline):
     result = qa_pipeline({'question': question, 'context': context})
@@ -222,12 +235,18 @@ def main():
             # Load the model from the downloaded files
             word2vec_model = Word2Vec.load("word2vec_finetuned.model")
     
-        # UI elements for semantic search
-        search_term = st.text_input("Enter a word for semantic search")
-        if st.button("Search"):
-            similar_words = semantic_search(word2vec_model, search_term, top_n=10)
-            df = pd.DataFrame(similar_words, columns=["Word", "Similarity Score"])
-            st.table(df)
+            # UI elements for semantic search
+            search_term = st.text_input("Enter a word for semantic search")
+            if st.button("Search"):
+                result, similar_words = semantic_search(word2vec_model, search_term, top_n=10)
+        
+                if similar_words is None:  # This means a misspelled word was suggested
+                    if st.button(f"Did you mean '{result}'?"):
+                        result, similar_words = semantic_search(word2vec_model, result, top_n=10)
+    
+                if similar_words is not None:
+                    df = pd.DataFrame(similar_words, columns=["Word", "Similarity Score"])
+                    st.table(df)
 
     elif app_mode == "Question Answering":
         st.title("Question Answering with BART")
